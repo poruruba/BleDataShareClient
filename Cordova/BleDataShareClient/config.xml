@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="jp.or.myhome.sample.BleDataShareClient" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>BleDataShareClient</name>
+    <description>Sample Apache Cordova App</description>
+    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
+        Apache Cordova Team
+    </author>
+    
+    <content src="index.html" />
+
+<!--
+    <allow-navigation href="https://[Webサーバのホスト名]/cordova_base/*" />
+-->
+    <platform name="android">
+      <config-file target="AndroidManifest.xml" parent="/manifest">
+          <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+          <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+          <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+          <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+      </config-file>
+      <preference name="AndroidLaunchMode" value="singleTask"/>
+      <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+
+      <icon density="ldpi" src="res/icon/android/36x36.png" />
+      <icon density="mdpi" src="res/icon/android/48x48.png" />
+      <icon density="hdpi" src="res/icon/android/72x72.png" />
+      <icon density="xhdpi" src="res/icon/android/96x96.png" />
+      <icon density="xxhdpi" src="res/icon/android/144x144.png" />
+      <icon density="xxxhdpi" src="res/icon/android/192x192.png" />
+<!--
+      <content src="https://[Webサーバのホスト名]/cordova_base/bledatashareclient/android/index.html" />
+-->
+    </platform>
+
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+</widget>

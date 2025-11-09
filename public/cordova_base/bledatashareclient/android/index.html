@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src * 'unsafe-inline'; media-src *; img-src * data: content: blob:;">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Cache-Control" content="no-cache">
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="css/start.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spinkit/2.0.1/spinkit.min.css" />
+  <script src="js/methods_bootstrap.js"></script>
+  <script src="js/components_bootstrap.js"></script>
+  <script src="js/components_utils.js"></script>
+  <script src="js/vue_utils.js"></script>
+  <script src="js/gql_utils.js"></script>
+
+  <script src="js/remoteconsole.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vconsole/dist/vconsole.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuex@3.x/dist/vuex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-router@3.x/dist/vue-router.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.5.3/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.9.1/beautify-html.js" async></script>
+
+  <title>DataShare Server</title>
+</head>
+<body>
+<!--
+    <div id="loader-background">
+      <div class="sk-plane sk-center"></div>
+    </div>
+-->
+    <div id="top" class="container">
+      <div class="jumbotron">
+        <h2>DataShare Server</h2>
+      </div>
+
+      <button class="btn btn-default btn-xs pull-right" v-on:click="reload">reload</button>
+      <button v-if="!is_advertising" class="btn btn-default" v-on:click="do_advertising(true)">Start</button>
+      <button v-else class="btn btn-default" v-on:click="do_advertising(false)">Stop</button>
+      <label>status</label> {{status}}
+      <label>advertising</label> {{is_advertising}} 
+      <br>
+      <br>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            送信
+          </div>
+          <div class="panel-body">
+            <div class="form-inline">
+              <label>type</label> <select class="form-control" v-model="type_select">
+                <option value="TEXT">TEXT</option>
+                <option value="FILE">FILE</option>
+                <option value="INTENT" disabled>INTENT</option>
+              </select>
+            </div>
+            <span v-if="type_select=='TEXT'">
+              <textarea type="text" rows="3" class="form-control" v-model="ble_read_text"></textarea>
+              <button class="btn btn-default" v-on:click="do_ble_read_text(ble_read_text)">セット</button>
+            </span>
+            <span v-if="type_select=='FILE'">
+              <comp_file id="test" v-bind:callback="file_callback"></comp_file>
+              <label>mime-type</label> {{ble_read_file.mimetype}} <button class="btn btn-default btn-sm" v-on:click="show_file(ble_read_file)">View</button><br>
+              <label>name</label> {{ble_read_file.name}}<br>
+              <label>size</label> {{ble_read_file.size}}<br>
+              <button class="btn btn-default" v-on:click="do_ble_read_file(ble_read_file)">セット</button>
+            </span>
+            <span v-if="type_select=='INTENT'">
+              <span v-if="ble_read_intent.type=='TEXT'">
+                <label>text</label> {{ble_read_intent.text}}<br>
+                <span v-if="ble_read_intent.description"><label>description</label> {{ble_read_intent.description}}<br></span>
+                <button class="btn btn-default" v-on:click="do_ble_read_text(ble_read_intent.text)">セット</button>
+              </span>
+              <span v-if="ble_read_intent.type=='FILE'">
+                <label>mime-type</label> {{ble_read_intent.mimetype}} <button class="btn btn-default btn-sm" v-on:click="show_file(ble_read_intent)">View</button><br>
+                <label>name</label> {{ble_read_intent.name}}<br>
+                <label>size</label> {{ble_read_intent.size}}<br>
+                <span v-if="ble_read_intent.description"><label>description</label> {{ble_read_intent.description}}<br></span>
+                <button class="btn btn-default" v-on:click="do_ble_read_file(ble_read_intent)">セット</button>
+              </span>
+            </span>
+            <br>
+            <br>
+            <button class="btn btn-default btn-lg" v-on:click="do_ble_write" v-bind:disabled="!is_advertising">送信</button>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            受信
+          </div>
+          <div class="panel-body">
+            <label>type</label> {{read_type_str}}
+            <div>
+              <span v-if="read_type==TYPE.EMPTY">
+                受信していません。
+              </span>
+              <span v-if="read_type==TYPE.TEXT">
+                <button class="btn btn-default btn-sm" v-on:click="clipboard_copy(read_text)">Copy</button>
+                <textarea type="text" rows="1" class="form-control" v-model="read_text"></textarea>
+                <label>received date</label> {{toLocaleString(read_received_date)}}<br>
+              </span>
+              <span v-if="read_type==TYPE.FILE">
+                <label>mime-type</label> {{read_file.mimetype}} <button class="btn btn-default btn-sm" v-on:click="show_file(read_file)">View</button><br>
+                <label>name</label> {{read_file.name}}<br>
+                <label>size</label> {{read_file.size}}<br>
+                <label>received date</label> {{toLocaleString(read_received_date)}}<br>
+                <button class="btn btn-default" v-on:click="do_file_save">Save</button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+
+
+        <modal-dialog id="permission_request_dialog">
+          <div slot="content">
+            <div class="modal-body">
+              <p>
+                アプリの許可が必要です。
+              </p>
+              <a v-on:click="open_application_detail">アプリの詳細</a>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+          </div>
+        </modal-dialog>
+
+      <div class="modal fade fullscreen" id="view_image_dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+              <h4 class="modal-title">Viewer</h4>
+            </div>
+            <div class="modal-body">
+              <img class="img-responsive" v-bind:src="image_value_src">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade fullscreen" id="view_textarea_dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+              <h4 class="modal-title">Viewer</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-inline">
+                <select class="form-control" v-model="text_value_bintext">
+                  <option value="text">text</option>
+                  <option value="binary">binary</option>
+                </select>
+                <span v-if="text_value_bintext=='text'">
+                  <select class="form-control" v-model="text_value_textencode">
+                    <option value="utf-8">utf-8</option>
+                    <option value="shift-jis">shift-jis</option>
+                    <option value="euc-jp">euc-jp</option>
+                    <option value="iso-2022-jp">iso-2022-jp</option>
+                  </select>
+                </span>
+                <span v-if="text_value_bintext=='binary'">
+                  <select class="form-control" v-model="text_value_binformat">
+                    <option value="1byte">1 byte</option>
+                    <option value="16byte">16 byte</option>
+                    <option value="none">none</option>
+                  </select>
+                </span>
+              </div>
+              <br>
+              <textarea class="form-control">{{text_value}}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade fullscreen" id="view_json_dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+              <h4 class="modal-title">Viewer</h4>
+            </div>
+            <div class="modal-body">
+              <label><input type="checkbox" v-model="json_value_format">format</label><br>
+              <textarea class="form-control">{{json_value}}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade fullscreen" id="view_html_dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+              <h4 class="modal-title">Viewer</h4>
+            </div>
+            <div class="modal-body">
+              <label><input type="checkbox" v-model="html_value_format">format</label><br>
+              <textarea class="form-control">{{html_value}}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade fullscreen" id="view_table_dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+              <h4 class="modal-title">Viewer</h4>
+            </div>
+            <div class="modal-body">
+              <label><input type="checkbox" v-model="table_value_head">head</label><br>
+              <table class="table table-striped" v-if="table_value_head">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th v-for="(item, index) in table_value_rows[0]">{{item}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in table_value_rows.slice(1)">
+                    <td>{{index + 1}}</td>
+                    <td v-for="(item2, index2) in item">{{item2}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <table class="table table-striped" v-else>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th v-for="(item, index) in table_value_colum">{{item}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in table_value_rows">
+                    <td>{{index + 1}}</td>
+                    <td v-for="(item2, index2) in item">{{item2}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <router-view></router-view>
+
+        <!-- for progress-dialog -->
+        <progress-dialog v-bind:title="progress_title"></progress-dialog>
+    </div>
+
+    <script src="js/lib_mimetype.js"></script>
+    <script src="js/lib_file.js"></script>
+    <script src="js/lib_dataurl.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/start.js"></script>
+
+    <script src="cordova.js"></script>
+    <script src="js/index.js"></script>
+</body>

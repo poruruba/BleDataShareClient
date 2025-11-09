@@ -15,7 +15,6 @@
   "devDependencies": {
     "cordova-android": "^14.0.1",
     "cordova-plugin-ble-peripheral": "github:poruruba/cordova-plugin-ble-peripheral",
-    "cordova-plugin-contenturl": "github:poruruba/cordova-plugin-contenturl",
     "cordova-plugin-device": "^2.1.0",
     "cordova-plugin-file": "^8.0.1",
     "cordova.plugins.diagnostic": "^7.1.4"
@@ -30,9 +29,7 @@
         "ANDROIDX_WEBKIT_VERSION": "1.4.0"
       },
       "cordova-plugin-device": {},
-      "com.napolitano.cordova.plugin.intent": {},
-      "cordova-plugin-ble-peripheral": {},
-      "cordova-plugin-contenturl": {}
+      "cordova-plugin-ble-peripheral": {}
     },
     "platforms": [
       "android"
